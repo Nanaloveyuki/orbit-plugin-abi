@@ -80,6 +80,14 @@ test "create invoke destroy follows the fixed ABI" {
     Err(PluginStatus(-42)) => ()
     _ => abort("plugin error status was not propagated")
   }
+  match instance.invoke("malformed", b"") {
+    Err(InvalidResponse) => ()
+    _ => abort("null response data with a non-zero length was accepted")
+  }
+  match instance.invoke("oversized", b"") {
+    Err(InvalidResponse) => ()
+    _ => abort("oversized response was accepted")
+  }
   instance.destroy()
   inspect(instance.is_destroyed(), content="true")
   match instance.invoke("echo", b"") {

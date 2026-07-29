@@ -42,6 +42,16 @@ static int32_t fixture_invoke(
   FixtureInstance *instance = (FixtureInstance *)raw_instance;
   if (instance == NULL || command == NULL || out_response == NULL) return -20;
   if (strcmp(command, "fail") == 0) return -42;
+  if (strcmp(command, "malformed") == 0) {
+    out_response->data = NULL;
+    out_response->len = 1;
+    return 0;
+  }
+  if (strcmp(command, "oversized") == 0) {
+    out_response->data = NULL;
+    out_response->len = UINT32_C(16) * UINT32_C(1024) * UINT32_C(1024) + 1;
+    return 0;
+  }
   if (strcmp(command, "echo") != 0) return -21;
   if (request_len > 0 && request == NULL) return -22;
   uint8_t *response = NULL;
