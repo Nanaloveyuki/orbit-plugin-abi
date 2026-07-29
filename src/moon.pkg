@@ -1,0 +1,11 @@
+import {
+  "moonbitlang/core/encoding/utf8",
+  "Nanaloveyuki/dynlib",
+}
+
+supported_targets = "native"
+
+options(
+  "native-stub": [ "plugin_abi.c", "fixture_plugin.c" ],
+  targets: { "ffi.mbt": [ "native" ] },
+)
