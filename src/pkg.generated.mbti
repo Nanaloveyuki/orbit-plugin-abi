@@ -1,0 +1,51 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Nanaloveyuki/orbit-plugin-abi"
+
+import {
+  "Nanaloveyuki/dynlib",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn supported_abi_version() -> UInt
+
+// Errors
+
+// Types and methods
+pub(all) enum AbiError {
+  InvalidAddress
+  IncompatibleAbi(UInt)
+  ManifestUnavailable
+  InvalidManifestUtf8
+  InvalidCommand
+  RequestTooLarge(Int)
+  InvalidResponse
+  PluginStatus(Int)
+  InstanceUnavailable
+  Destroyed
+} derive(Eq, @debug.Debug)
+
+pub struct Plugin {
+  // private fields
+}
+pub fn Plugin::create(Self) -> Result[PluginInstance, AbiError]
+pub fn Plugin::manifest_json(Self) -> String
+pub fn Plugin::open(PluginAddresses) -> Result[Self, AbiError]
+
+pub struct PluginAddresses {
+  // private fields
+}
+pub fn PluginAddresses::from_symbols(@dynlib.Symbol, @dynlib.Symbol, @dynlib.Symbol, @dynlib.Symbol, @dynlib.Symbol) -> Result[Self, AbiError]
+pub fn PluginAddresses::new(UInt64, UInt64, UInt64, UInt64, UInt64) -> Result[Self, AbiError]
+
+pub struct PluginInstance {
+  // private fields
+}
+pub fn PluginInstance::destroy(Self) -> Unit
+pub fn PluginInstance::invoke(Self, String, Bytes) -> Result[Bytes, AbiError]
+pub fn PluginInstance::is_destroyed(Self) -> Bool
+
+// Type aliases
+
+// Traits
+
