@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Add an explicit blocking executor join for host teardown after
+  `begin_shutdown`; shutdown now releases event-byte backpressure before the
+  worker is joined.
+
 ## 0.2.0
 
 - Add ABI v2 while preserving the five exported plugin symbols and the complete

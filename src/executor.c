@@ -433,17 +433,25 @@ static void orbit_executor_publish_completion(
   event->payload = response;
   event->payload_len = response_len;
   orbit_mutex_lock(&executor->lock);
-  uint64_t event_bytes = orbit_executor_event_bytes(event);
-  while (executor->event_bytes + event_bytes >
-         ORBIT_EXECUTOR_MAX_EVENT_BYTES) {
-    orbit_cond_wait(&executor->event_space_available, &executor->lock);
-  }
   if (executor->current_job == job &&
       (job->cancelled || executor->closing)) {
     free(event->payload);
     event->payload = NULL;
     event->payload_len = 0;
     event->status = ORBIT_EXECUTOR_CANCELLED;
+  }
+  uint64_t event_bytes = orbit_executor_event_bytes(event);
+  while (executor->event_bytes + event_bytes >
+         ORBIT_EXECUTOR_MAX_EVENT_BYTES) {
+    orbit_cond_wait(&executor->event_space_available, &executor->lock);
+    if (executor->current_job == job &&
+        (job->cancelled || executor->closing)) {
+      free(event->payload);
+      event->payload = NULL;
+      event->payload_len = 0;
+      event->status = ORBIT_EXECUTOR_CANCELLED;
+      event_bytes = 0;
+    }
   }
   orbit_executor_queue_event_locked(executor, event);
   orbit_mutex_unlock(&executor->lock);
@@ -966,6 +974,46 @@ MOONBIT_FFI_EXPORT int32_t orbit_plugin_executor_join_stopped(
   int stopped = executor->stopped;
   orbit_mutex_unlock(&executor->lock);
   if (!stopped) return ORBIT_EXECUTOR_WOULD_BLOCK;
+  if (!executor->joined) {
+#ifdef _WIN32
+    (void)WaitForSingleObject(executor->thread, INFINITE);
+    (void)CloseHandle(executor->thread);
+#else
+    (void)pthread_join(executor->thread, NULL);
+#endif
+    executor->joined = 1;
+  }
+  OrbitExecutorJob *job = executor->jobs_head;
+  while (job != NULL) {
+    OrbitExecutorJob *next = job->next;
+    orbit_executor_free_job(job);
+    job = next;
+  }
+  OrbitExecutorEvent *event = executor->events_head;
+  while (event != NULL) {
+    OrbitExecutorEvent *next = event->next;
+    orbit_executor_free_event(event);
+    event = next;
+  }
+  orbit_executor_free_event(executor->ready_event);
+  orbit_executor_free_event(executor->stopped_event);
+  orbit_cond_destroy(&executor->event_space_available);
+  orbit_cond_destroy(&executor->host_request_completed);
+  orbit_cond_destroy(&executor->work_available);
+  orbit_mutex_destroy(&executor->lock);
+  free(executor);
+  return ORBIT_EXECUTOR_OK;
+}
+
+MOONBIT_FFI_EXPORT int32_t orbit_plugin_executor_join(
+    uint64_t executor_address) {
+  OrbitPluginExecutor *executor =
+      (OrbitPluginExecutor *)(uintptr_t)executor_address;
+  if (executor == NULL) return ORBIT_EXECUTOR_INVALID_INPUT;
+  orbit_mutex_lock(&executor->lock);
+  int closing = executor->closing;
+  orbit_mutex_unlock(&executor->lock);
+  if (!closing) return ORBIT_EXECUTOR_INVALID_INPUT;
   if (!executor->joined) {
 #ifdef _WIN32
     (void)WaitForSingleObject(executor->thread, INFINITE);

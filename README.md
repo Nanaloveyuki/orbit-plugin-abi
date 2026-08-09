@@ -67,7 +67,9 @@ Cancellation is cooperative. `OrbitHostV2::invocation_cancelled` observes the
 current invocation's native cancellation flag, and cancellation unblocks a
 pending host request. Orbit cannot safely preempt arbitrary plugin code. Begin
 shutdown first, continue polling until `Stopped`, then call `join_stopped`
-before unloading the dynamic library.
+before unloading the dynamic library. A host with a synchronous teardown path
+may instead call `begin_shutdown` followed by blocking `join`; trusted plugin
+code that ignores cooperative cancellation can delay that join indefinitely.
 
 ## Ownership and lifetime
 
