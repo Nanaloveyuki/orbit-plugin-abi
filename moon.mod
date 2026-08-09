@@ -1,6 +1,6 @@
 name = "Nanaloveyuki/orbit-plugin-abi"
 
-version = "0.2.1"
+version = "0.2.2"
 
 description = "Fixed, auditable native ABI bridge for Orbit plugins."
 
