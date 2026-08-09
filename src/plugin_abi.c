@@ -127,14 +127,20 @@ MOONBIT_FFI_EXPORT moonbit_bytes_t orbit_plugin_abi_call_manifest(
 MOONBIT_FFI_EXPORT moonbit_bytes_t orbit_plugin_abi_call_create(
     uint64_t address) {
   if (address == 0) {
-    return orbit_plugin_result(ORBIT_PLUGIN_WRAPPER_INVALID_INPUT, NULL, 0);
+    moonbit_bytes_t invalid = moonbit_make_bytes(16, 0);
+    if (invalid == NULL) return orbit_plugin_empty_bytes();
+    orbit_plugin_write_u32_le(
+        invalid, (uint32_t)ORBIT_PLUGIN_WRAPPER_INVALID_INPUT);
+    return invalid;
   }
   orbit_plugin_create_fn function = (orbit_plugin_create_fn)(uintptr_t)address;
   void *instance = NULL;
   int32_t status = function(&ORBIT_PLUGIN_HOST_V1, &instance);
-  uint8_t payload[8];
-  orbit_plugin_write_u64_le(payload, (uint64_t)(uintptr_t)instance);
-  return orbit_plugin_result(status, payload, sizeof(payload));
+  moonbit_bytes_t result = moonbit_make_bytes(16, 0);
+  if (result == NULL) return orbit_plugin_empty_bytes();
+  orbit_plugin_write_u32_le(result, (uint32_t)status);
+  orbit_plugin_write_u64_le(result + 8, (uint64_t)(uintptr_t)instance);
+  return result;
 }
 
 MOONBIT_FFI_EXPORT moonbit_bytes_t orbit_plugin_abi_call_invoke(

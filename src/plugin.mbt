@@ -2,6 +2,9 @@
 const ABI_VERSION_V1 : UInt = 1
 
 ///|
+const ABI_VERSION_V2 : UInt = 2
+
+///|
 const MAX_MANIFEST_BYTES : Int = 1024 * 1024
 
 ///|
@@ -32,6 +35,21 @@ pub(all) enum AbiError {
   PluginStatus(Int)
   InstanceUnavailable
   Destroyed
+  ExecutorRequired
+  ExecutorUnsupported
+  ExecutorUnavailable
+  ExecutorQueueFull
+  DuplicateInvocation
+  ExecutorClosed
+  InvocationUnavailable
+  MalformedEvent
+  ExecutorStatus(Int)
+} derive(Eq, Debug)
+
+///|
+pub(all) enum AbiVersion {
+  V1
+  V2
 } derive(Eq, Debug)
 
 ///|
@@ -52,6 +70,7 @@ pub struct PluginAddresses {
 pub struct Plugin {
   priv addresses : PluginAddresses
   priv manifest : String
+  priv abi_version : AbiVersion
 }
 
 ///|
@@ -68,7 +87,13 @@ pub struct PluginInstance {
 ///|
 /// Returns the supported plugin ABI version.
 pub fn supported_abi_version() -> UInt {
-  ABI_VERSION_V1
+  ABI_VERSION_V2
+}
+
+///|
+/// Returns every ABI version accepted by this host bridge.
+pub fn supported_abi_versions() -> Array[UInt] {
+  [ABI_VERSION_V1, ABI_VERSION_V2]
 }
 
 ///|
@@ -141,8 +166,10 @@ pub fn PluginAddresses::from_symbols(
 /// JSON.
 pub fn Plugin::open(addresses : PluginAddresses) -> Result[Plugin, AbiError] {
   let reported_version = native_abi_version(addresses.abi_version_address)
-  if reported_version != ABI_VERSION_V1 {
-    return Err(IncompatibleAbi(reported_version))
+  let abi_version = match reported_version {
+    1 => V1
+    2 => V2
+    version => return Err(IncompatibleAbi(version))
   }
   let manifest_bytes = native_manifest(addresses.manifest_address)
   if manifest_bytes.is_empty() || manifest_bytes.length() > MAX_MANIFEST_BYTES {
@@ -151,7 +178,13 @@ pub fn Plugin::open(addresses : PluginAddresses) -> Result[Plugin, AbiError] {
   let manifest = @utf8.decode(manifest_bytes) catch {
     _ => return Err(InvalidManifestUtf8)
   }
-  Ok({ addresses, manifest })
+  Ok({ addresses, manifest, abi_version })
+}
+
+///|
+/// Returns the exact ABI version reported by the plugin.
+pub fn Plugin::abi_version(self : Plugin) -> AbiVersion {
+  self.abi_version
 }
 
 ///|
@@ -164,8 +197,11 @@ pub fn Plugin::manifest_json(self : Plugin) -> String {
 /// Creates one plugin instance with a process-static HostV1. The plugin may
 /// retain that host pointer until destroy is called.
 pub fn Plugin::create(self : Plugin) -> Result[PluginInstance, AbiError] {
+  if self.abi_version != V1 {
+    return Err(ExecutorRequired)
+  }
   let frame = native_create(self.addresses.create_address)
-  if frame.length() != 12 {
+  if frame.length() != 16 {
     return Err(InvalidResponse)
   }
   let status = match frame {
@@ -176,7 +212,7 @@ pub fn Plugin::create(self : Plugin) -> Result[PluginInstance, AbiError] {
     return Err(PluginStatus(status))
   }
   let handle = match frame {
-    [_, _, _, _, u64le(value)] => value
+    [_, _, _, _, _, _, _, _, u64le(value)] => value
     _ => return Err(InvalidResponse)
   }
   if handle == 0UL {
