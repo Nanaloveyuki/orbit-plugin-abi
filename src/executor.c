@@ -61,6 +61,19 @@ static void orbit_cond_broadcast(orbit_cond_t *value) { (void)pthread_cond_broad
 #define ORBIT_EXECUTOR_DUPLICATE_ID INT32_C(-2147483443)
 #define ORBIT_EXECUTOR_WOULD_BLOCK INT32_C(-2147483442)
 #define ORBIT_EXECUTOR_MALFORMED_RESPONSE INT32_C(-2147483441)
+#define ORBIT_EXECUTOR_THREAD_FAILURE INT32_C(-2147483440)
+
+static int32_t orbit_thread_join(orbit_thread_t thread) {
+#ifdef _WIN32
+  if (WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0) {
+    return ORBIT_EXECUTOR_THREAD_FAILURE;
+  }
+  if (!CloseHandle(thread)) return ORBIT_EXECUTOR_THREAD_FAILURE;
+#else
+  if (pthread_join(thread, NULL) != 0) return ORBIT_EXECUTOR_THREAD_FAILURE;
+#endif
+  return ORBIT_EXECUTOR_OK;
+}
 
 #define ORBIT_EVENT_READY UINT32_C(1)
 #define ORBIT_EVENT_INVOCATION_FINISHED UINT32_C(2)
@@ -975,12 +988,8 @@ MOONBIT_FFI_EXPORT int32_t orbit_plugin_executor_join_stopped(
   orbit_mutex_unlock(&executor->lock);
   if (!stopped) return ORBIT_EXECUTOR_WOULD_BLOCK;
   if (!executor->joined) {
-#ifdef _WIN32
-    (void)WaitForSingleObject(executor->thread, INFINITE);
-    (void)CloseHandle(executor->thread);
-#else
-    (void)pthread_join(executor->thread, NULL);
-#endif
+    int32_t join_status = orbit_thread_join(executor->thread);
+    if (join_status != ORBIT_EXECUTOR_OK) return join_status;
     executor->joined = 1;
   }
   OrbitExecutorJob *job = executor->jobs_head;
@@ -1015,12 +1024,8 @@ MOONBIT_FFI_EXPORT int32_t orbit_plugin_executor_join(
   orbit_mutex_unlock(&executor->lock);
   if (!closing) return ORBIT_EXECUTOR_INVALID_INPUT;
   if (!executor->joined) {
-#ifdef _WIN32
-    (void)WaitForSingleObject(executor->thread, INFINITE);
-    (void)CloseHandle(executor->thread);
-#else
-    (void)pthread_join(executor->thread, NULL);
-#endif
+    int32_t join_status = orbit_thread_join(executor->thread);
+    if (join_status != ORBIT_EXECUTOR_OK) return join_status;
     executor->joined = 1;
   }
   OrbitExecutorJob *job = executor->jobs_head;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Make OS thread join and Windows thread-handle close failures observable so a
+  host can keep the plugin library loaded when worker termination is not
+  confirmed.
+
 ## 0.2.1
 
 - Add an explicit blocking executor join for host teardown after
