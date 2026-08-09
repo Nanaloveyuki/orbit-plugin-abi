@@ -409,3 +409,17 @@ test "v2 host callbacks reject calls outside the executor worker" {
   }
   stop_fixture_v2_executor(executor)
 }
+
+///|
+test "v2 blocking join requires shutdown and releases without polling stopped" {
+  let executor = start_fixture_v2_executor()
+  match executor.join() {
+    Err(ExecutorStatus(_)) => ()
+    _ => abort("executor joined before shutdown")
+  }
+  executor.submit(50UL, "cancel", b"").unwrap()
+  fixture_sleep()
+  executor.begin_shutdown()
+  executor.join().unwrap()
+  assert_true(executor.is_closed())
+}

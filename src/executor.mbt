@@ -290,6 +290,24 @@ pub fn PluginExecutor::join_stopped(
 }
 
 ///|
+/// Blocks until the executor worker has destroyed the plugin, then releases
+/// all native executor state. Call `begin_shutdown` first. Arbitrary plugin
+/// code remains trusted and can delay this join indefinitely if it ignores
+/// cooperative cancellation.
+pub fn PluginExecutor::join(self : PluginExecutor) -> Result[Unit, AbiError] {
+  if self.handle == 0UL {
+    return Ok(())
+  }
+  match executor_status(native_executor_join(self.handle)) {
+    Ok(_) => {
+      self.handle = 0UL
+      Ok(())
+    }
+    Err(error) => Err(error)
+  }
+}
+
+///|
 pub fn PluginExecutor::is_closed(self : PluginExecutor) -> Bool {
   self.handle == 0UL
 }

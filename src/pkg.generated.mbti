@@ -80,6 +80,7 @@ pub fn PluginExecutor::cancel(Self, UInt64) -> Result[Unit, AbiError]
 pub fn PluginExecutor::cancel_host_request(Self, UInt64, Int) -> Result[Unit, AbiError]
 pub fn PluginExecutor::complete_host_request(Self, UInt64, Bytes) -> Result[Unit, AbiError]
 pub fn PluginExecutor::is_closed(Self) -> Bool
+pub fn PluginExecutor::join(Self) -> Result[Unit, AbiError]
 pub fn PluginExecutor::join_stopped(Self) -> Result[Unit, AbiError]
 pub fn PluginExecutor::poll_event(Self) -> Result[ExecutorEvent?, AbiError]
 pub fn PluginExecutor::submit(Self, UInt64, String, Bytes) -> Result[Unit, AbiError]

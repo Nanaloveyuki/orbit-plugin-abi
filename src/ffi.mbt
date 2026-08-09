@@ -66,3 +66,6 @@ extern "C" fn native_executor_begin_shutdown(executor : UInt64) -> Unit = "orbit
 
 ///|
 extern "C" fn native_executor_join_stopped(executor : UInt64) -> Int = "orbit_plugin_executor_join_stopped"
+
+///|
+extern "C" fn native_executor_join(executor : UInt64) -> Int = "orbit_plugin_executor_join"
