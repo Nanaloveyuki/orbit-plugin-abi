@@ -9,6 +9,8 @@ import {
 // Values
 pub fn supported_abi_version() -> UInt
 
+pub fn supported_abi_versions() -> Array[UInt]
+
 // Errors
 
 // Types and methods
@@ -23,20 +25,64 @@ pub(all) enum AbiError {
   PluginStatus(Int)
   InstanceUnavailable
   Destroyed
+  ExecutorRequired
+  ExecutorUnsupported
+  ExecutorUnavailable
+  ExecutorQueueFull
+  DuplicateInvocation
+  ExecutorClosed
+  InvocationUnavailable
+  MalformedEvent
+  ExecutorStatus(Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum AbiVersion {
+  V1
+  V2
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ExecutorEvent {
+  Ready(Int)
+  InvocationFinished(UInt64, Int, Bytes)
+  HostRequest(HostRequest)
+  HostRequestCancelled(UInt64, UInt64, Int)
+  Stopped
+} derive(Eq, @debug.Debug)
+
+pub(all) struct HostRequest {
+  request_id : UInt64
+  invocation_id : UInt64
+  command : String
+  request : Bytes
+  timeout_ms : UInt
 } derive(Eq, @debug.Debug)
 
 pub struct Plugin {
   // private fields
 }
+pub fn Plugin::abi_version(Self) -> AbiVersion
 pub fn Plugin::create(Self) -> Result[PluginInstance, AbiError]
 pub fn Plugin::manifest_json(Self) -> String
 pub fn Plugin::open(PluginAddresses) -> Result[Self, AbiError]
+pub fn Plugin::start_executor(Self, FuncRef[() -> Unit]) -> Result[PluginExecutor, AbiError]
 
 pub struct PluginAddresses {
   // private fields
 }
 pub fn PluginAddresses::from_symbols(@dynlib.Symbol, @dynlib.Symbol, @dynlib.Symbol, @dynlib.Symbol, @dynlib.Symbol) -> Result[Self, AbiError]
 pub fn PluginAddresses::new(UInt64, UInt64, UInt64, UInt64, UInt64) -> Result[Self, AbiError]
+
+pub struct PluginExecutor {
+  // private fields
+}
+pub fn PluginExecutor::begin_shutdown(Self) -> Unit
+pub fn PluginExecutor::cancel(Self, UInt64) -> Result[Unit, AbiError]
+pub fn PluginExecutor::cancel_host_request(Self, UInt64, Int) -> Result[Unit, AbiError]
+pub fn PluginExecutor::complete_host_request(Self, UInt64, Bytes) -> Result[Unit, AbiError]
+pub fn PluginExecutor::is_closed(Self) -> Bool
+pub fn PluginExecutor::join_stopped(Self) -> Result[Unit, AbiError]
+pub fn PluginExecutor::poll_event(Self) -> Result[ExecutorEvent?, AbiError]
+pub fn PluginExecutor::submit(Self, UInt64, String, Bytes) -> Result[Unit, AbiError]
 
 pub struct PluginInstance {
   // private fields
@@ -48,4 +94,3 @@ pub fn PluginInstance::is_destroyed(Self) -> Bool
 // Type aliases
 
 // Traits
-

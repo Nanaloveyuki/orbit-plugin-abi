@@ -6,6 +6,11 @@ import {
 supported_targets = "native"
 
 options(
-  "native-stub": [ "plugin_abi.c", "fixture_plugin.c" ],
+  "native-stub": [
+    "plugin_abi.c",
+    "executor.c",
+    "fixture_plugin.c",
+    "fixture_v1_compat.c",
+  ],
   targets: { "ffi.mbt": [ "native" ] },
 )
