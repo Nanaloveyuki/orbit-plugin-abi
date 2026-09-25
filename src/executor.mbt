@@ -46,6 +46,19 @@ pub(all) struct HostRequest {
 } derive(Eq, Debug)
 
 ///|
+pub extend HostRequest with Eq::{equal}
+
+///|
+#deprecated("Use `!=` instead", skip_current_package=true)
+#doc(hidden)
+pub extend HostRequest with Eq::{not_equal}
+
+///|
+#deprecated("Use `Debug::to_repr` instead", skip_current_package=true)
+#doc(hidden)
+pub extend HostRequest with @debug.Debug::{to_repr}
+
+///|
 /// Events produced by a native plugin executor and drained on the host thread.
 ///
 /// Status zero means success. A non-zero invocation status is either the
@@ -57,6 +70,19 @@ pub(all) enum ExecutorEvent {
   HostRequestCancelled(UInt64, UInt64, Int)
   Stopped
 } derive(Eq, Debug)
+
+///|
+pub extend ExecutorEvent with Eq::{equal}
+
+///|
+#deprecated("Use `!=` instead", skip_current_package=true)
+#doc(hidden)
+pub extend ExecutorEvent with Eq::{not_equal}
+
+///|
+#deprecated("Use `Debug::to_repr` instead", skip_current_package=true)
+#doc(hidden)
+pub extend ExecutorEvent with @debug.Debug::{to_repr}
 
 ///|
 /// A v2 plugin instance and its dedicated native worker.
@@ -182,8 +208,10 @@ fn parse_executor_event(frame : Bytes) -> Result[ExecutorEvent, AbiError] {
     payload_length != frame.length() - 40 - command_length {
     return Err(MalformedEvent)
   }
-  let command_bytes = frame.view(start=40, end=40 + command_length).to_owned()
-  let payload = frame.view(start=40 + command_length).to_owned()
+  let command_bytes = frame
+    .exact_view(start=40, end=40 + command_length)
+    .to_owned()
+  let payload = frame.exact_view(start=40 + command_length).to_owned()
   match kind {
     EXECUTOR_EVENT_READY if command_length == 0 && payload_length == 0 =>
       Ok(Ready(status))

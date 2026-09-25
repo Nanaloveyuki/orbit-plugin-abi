@@ -64,8 +64,8 @@ fn fixture_wakeup_callback() -> FuncRef[() -> Unit] {
 }
 
 ///|
-fn fixture_addresses() -> PluginAddresses {
-  PluginAddresses::new(
+fn fixture_addresses() -> @orbit-plugin-abi.PluginAddresses {
+  @orbit-plugin-abi.PluginAddresses::new(
     fixture_abi_version_address(),
     fixture_manifest_address(),
     fixture_create_address(),
@@ -75,8 +75,8 @@ fn fixture_addresses() -> PluginAddresses {
 }
 
 ///|
-fn fixture_v2_addresses() -> PluginAddresses {
-  PluginAddresses::new(
+fn fixture_v2_addresses() -> @orbit-plugin-abi.PluginAddresses {
+  @orbit-plugin-abi.PluginAddresses::new(
     fixture_v2_abi_version_address(),
     fixture_manifest_address(),
     fixture_v2_create_address(),
@@ -86,8 +86,8 @@ fn fixture_v2_addresses() -> PluginAddresses {
 }
 
 ///|
-fn fixture_v1_compat_addresses() -> PluginAddresses {
-  PluginAddresses::new(
+fn fixture_v1_compat_addresses() -> @orbit-plugin-abi.PluginAddresses {
+  @orbit-plugin-abi.PluginAddresses::new(
     fixture_v1_compat_version_address(),
     fixture_v1_compat_manifest_address(),
     fixture_v1_compat_create_address(),
@@ -97,8 +97,8 @@ fn fixture_v1_compat_addresses() -> PluginAddresses {
 }
 
 ///|
-fn fixture_v2_create_failure_addresses() -> PluginAddresses {
-  PluginAddresses::new(
+fn fixture_v2_create_failure_addresses() -> @orbit-plugin-abi.PluginAddresses {
+  @orbit-plugin-abi.PluginAddresses::new(
     fixture_v2_abi_version_address(),
     fixture_manifest_address(),
     fixture_v2_create_failure_address(),
@@ -108,7 +108,9 @@ fn fixture_v2_create_failure_addresses() -> PluginAddresses {
 }
 
 ///|
-fn next_executor_event(executor : PluginExecutor) -> ExecutorEvent {
+fn next_executor_event(
+  executor : @orbit-plugin-abi.PluginExecutor,
+) -> @orbit-plugin-abi.ExecutorEvent {
   for attempt = 0; attempt < 5000; attempt = attempt + 1 {
     match executor.poll_event().unwrap() {
       Some(event) => return event
@@ -119,8 +121,8 @@ fn next_executor_event(executor : PluginExecutor) -> ExecutorEvent {
 }
 
 ///|
-fn start_fixture_v2_executor() -> PluginExecutor {
-  let plugin = Plugin::open(fixture_v2_addresses()).unwrap()
+fn start_fixture_v2_executor() -> @orbit-plugin-abi.PluginExecutor {
+  let plugin = @orbit-plugin-abi.Plugin::open(fixture_v2_addresses()).unwrap()
   if plugin.abi_version() != V2 {
     abort("v2 fixture reported the wrong ABI")
   }
@@ -136,7 +138,9 @@ fn start_fixture_v2_executor() -> PluginExecutor {
 }
 
 ///|
-fn stop_fixture_v2_executor(executor : PluginExecutor) -> Unit {
+fn stop_fixture_v2_executor(
+  executor : @orbit-plugin-abi.PluginExecutor,
+) -> Unit {
   executor.begin_shutdown()
   match next_executor_event(executor) {
     Stopped => ()
@@ -151,7 +155,7 @@ fn stop_fixture_v2_executor(executor : PluginExecutor) -> Unit {
 ///|
 test "address constructor rejects an invalid address without a native call" {
   match
-    PluginAddresses::new(
+    @orbit-plugin-abi.PluginAddresses::new(
       0UL,
       fixture_manifest_address(),
       fixture_create_address(),
@@ -165,25 +169,25 @@ test "address constructor rejects an invalid address without a native call" {
 
 ///|
 test "open copies and validates the ABI manifest" {
-  let plugin = Plugin::open(fixture_addresses()).unwrap()
+  let plugin = @orbit-plugin-abi.Plugin::open(fixture_addresses()).unwrap()
   inspect(
     plugin.manifest_json(),
     content="{\"name\":\"fixture\",\"commands\":[\"echo\"]}",
   )
-  inspect(supported_abi_version(), content="2")
-  assert_eq(supported_abi_versions(), [1, 2])
+  inspect(@orbit-plugin-abi.supported_abi_version(), content="2")
+  assert_eq(@orbit-plugin-abi.supported_abi_versions(), [1, 2])
 }
 
 ///|
 test "open rejects an incompatible ABI version" {
-  let addresses = PluginAddresses::new(
+  let addresses = @orbit-plugin-abi.PluginAddresses::new(
     fixture_incompatible_abi_address(),
     fixture_manifest_address(),
     fixture_create_address(),
     fixture_invoke_address(),
     fixture_destroy_address(),
   ).unwrap()
-  match Plugin::open(addresses) {
+  match @orbit-plugin-abi.Plugin::open(addresses) {
     Err(IncompatibleAbi(3)) => ()
     _ => abort("incompatible ABI was accepted")
   }
@@ -191,7 +195,7 @@ test "open rejects an incompatible ABI version" {
 
 ///|
 test "create invoke destroy follows the fixed ABI" {
-  let plugin = Plugin::open(fixture_addresses()).unwrap()
+  let plugin = @orbit-plugin-abi.Plugin::open(fixture_addresses()).unwrap()
   let instance = plugin.create().unwrap()
   inspect(
     instance.invoke("echo", b"request").unwrap() == b"request",
@@ -221,7 +225,7 @@ test "create invoke destroy follows the fixed ABI" {
 
 ///|
 test "v1 plugin compiled from the 0.1.0 declarations remains compatible" {
-  let plugin = Plugin::open(fixture_v1_compat_addresses()).unwrap()
+  let plugin = @orbit-plugin-abi.Plugin::open(fixture_v1_compat_addresses()).unwrap()
   assert_eq(plugin.abi_version(), V1)
   let instance = plugin.create().unwrap()
   assert_eq(instance.invoke("echo", b"legacy").unwrap(), b"legacy")
@@ -243,7 +247,9 @@ test "v2 executor preserves worker affinity and copies invocation results" {
 
 ///|
 test "v2 create failure completes work queued before ready" {
-  let plugin = Plugin::open(fixture_v2_create_failure_addresses()).unwrap()
+  let plugin = @orbit-plugin-abi.Plugin::open(
+    fixture_v2_create_failure_addresses(),
+  ).unwrap()
   let executor = plugin.start_executor(fixture_wakeup_callback()).unwrap()
   executor.submit(20UL, "echo", b"queued").unwrap()
   match next_executor_event(executor) {

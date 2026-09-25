@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3
+
+- Build with MoonBit nightly 0.1.20260923.
+- Depend on `Nanaloveyuki/dynlib` 0.2.1.
+- Promote `Eq::equal` to an explicit method and keep `not_equal` and
+  `Debug::to_repr` as hidden deprecated methods.
+- Replace deprecated `Bytes::view` calls with `Bytes::exact_view`.
+
 ## 0.2.2
 
 - Make OS thread join and Windows thread-handle close failures observable so a

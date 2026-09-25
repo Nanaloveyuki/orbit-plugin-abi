@@ -47,10 +47,36 @@ pub(all) enum AbiError {
 } derive(Eq, Debug)
 
 ///|
+pub extend AbiError with Eq::{equal}
+
+///|
+#deprecated("Use `!=` instead", skip_current_package=true)
+#doc(hidden)
+pub extend AbiError with Eq::{not_equal}
+
+///|
+#deprecated("Use `Debug::to_repr` instead", skip_current_package=true)
+#doc(hidden)
+pub extend AbiError with @debug.Debug::{to_repr}
+
+///|
 pub(all) enum AbiVersion {
   V1
   V2
 } derive(Eq, Debug)
+
+///|
+pub extend AbiVersion with Eq::{equal}
+
+///|
+#deprecated("Use `!=` instead", skip_current_package=true)
+#doc(hidden)
+pub extend AbiVersion with Eq::{not_equal}
+
+///|
+#deprecated("Use `Debug::to_repr` instead", skip_current_package=true)
+#doc(hidden)
+pub extend AbiVersion with @debug.Debug::{to_repr}
 
 ///|
 /// The five required addresses obtained from Nanaloveyuki/dynlib symbols.
@@ -178,7 +204,7 @@ pub fn Plugin::open(addresses : PluginAddresses) -> Result[Plugin, AbiError] {
   let manifest = @utf8.decode(manifest_bytes) catch {
     _ => return Err(InvalidManifestUtf8)
   }
-  Ok({ addresses, manifest, abi_version })
+  Ok({ addresses, manifest, abi_version, })
 }
 
 ///|
@@ -272,7 +298,7 @@ pub fn PluginInstance::invoke(
   if status != 0 {
     return Err(PluginStatus(status))
   }
-  Ok(frame.view(start=4).to_owned())
+  Ok(frame.exact_view(start=4).to_owned())
 }
 
 ///|

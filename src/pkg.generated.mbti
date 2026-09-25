@@ -35,11 +35,13 @@ pub(all) enum AbiError {
   MalformedEvent
   ExecutorStatus(Int)
 } derive(Eq, @debug.Debug)
+pub fn AbiError::equal(Self, Self) -> Bool
 
 pub(all) enum AbiVersion {
   V1
   V2
 } derive(Eq, @debug.Debug)
+pub fn AbiVersion::equal(Self, Self) -> Bool
 
 pub(all) enum ExecutorEvent {
   Ready(Int)
@@ -48,6 +50,7 @@ pub(all) enum ExecutorEvent {
   HostRequestCancelled(UInt64, UInt64, Int)
   Stopped
 } derive(Eq, @debug.Debug)
+pub fn ExecutorEvent::equal(Self, Self) -> Bool
 
 pub(all) struct HostRequest {
   request_id : UInt64
@@ -56,6 +59,7 @@ pub(all) struct HostRequest {
   request : Bytes
   timeout_ms : UInt
 } derive(Eq, @debug.Debug)
+pub fn HostRequest::equal(Self, Self) -> Bool
 
 pub struct Plugin {
   // private fields
