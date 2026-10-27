@@ -1,38 +1,38 @@
 ///|
-const ABI_VERSION_V1 : UInt = 1
+const ABI_VERSION_V1 : UInt32 = 1
 
 ///|
-const ABI_VERSION_V2 : UInt = 2
+const ABI_VERSION_V2 : UInt32 = 2
 
 ///|
-const MAX_MANIFEST_BYTES : Int = 1024 * 1024
+const MAX_MANIFEST_BYTES : Int32 = 1024 * 1024
 
 ///|
-const MAX_COMMAND_BYTES : Int = 1024
+const MAX_COMMAND_BYTES : Int32 = 1024
 
 ///|
-const MAX_REQUEST_BYTES : Int = 16 * 1024 * 1024
+const MAX_REQUEST_BYTES : Int32 = 16 * 1024 * 1024
 
 ///|
-const MAX_RESPONSE_BYTES : Int = 16 * 1024 * 1024
+const MAX_RESPONSE_BYTES : Int32 = 16 * 1024 * 1024
 
 ///|
-const WRAPPER_MALFORMED_RESPONSE : Int = -2147483648
+const WRAPPER_MALFORMED_RESPONSE : Int32 = -2147483648
 
 ///|
-const WRAPPER_INVALID_INPUT : Int = -2147483647
+const WRAPPER_INVALID_INPUT : Int32 = -2147483647
 
 ///|
 /// A failure reported by the fixed Orbit plugin ABI bridge.
 pub(all) enum AbiError {
   InvalidAddress
-  IncompatibleAbi(UInt)
+  IncompatibleAbi(UInt32)
   ManifestUnavailable
   InvalidManifestUtf8
   InvalidCommand
-  RequestTooLarge(Int)
+  RequestTooLarge(Int32)
   InvalidResponse
-  PluginStatus(Int)
+  PluginStatus(Int32)
   InstanceUnavailable
   Destroyed
   ExecutorRequired
@@ -43,7 +43,7 @@ pub(all) enum AbiError {
   ExecutorClosed
   InvocationUnavailable
   MalformedEvent
-  ExecutorStatus(Int)
+  ExecutorStatus(Int32)
 } derive(Eq, Debug)
 
 ///|
@@ -112,13 +112,13 @@ pub struct PluginInstance {
 
 ///|
 /// Returns the supported plugin ABI version.
-pub fn supported_abi_version() -> UInt {
+pub fn supported_abi_version() -> UInt32 {
   ABI_VERSION_V2
 }
 
 ///|
 /// Returns every ABI version accepted by this host bridge.
-pub fn supported_abi_versions() -> Array[UInt] {
+pub fn supported_abi_versions() -> Array[UInt32] {
   [ABI_VERSION_V1, ABI_VERSION_V2]
 }
 

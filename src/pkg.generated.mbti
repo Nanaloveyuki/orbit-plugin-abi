@@ -7,22 +7,22 @@ import {
 }
 
 // Values
-pub fn supported_abi_version() -> UInt
+pub fn supported_abi_version() -> UInt32
 
-pub fn supported_abi_versions() -> Array[UInt]
+pub fn supported_abi_versions() -> Array[UInt32]
 
 // Errors
 
 // Types and methods
 pub(all) enum AbiError {
   InvalidAddress
-  IncompatibleAbi(UInt)
+  IncompatibleAbi(UInt32)
   ManifestUnavailable
   InvalidManifestUtf8
   InvalidCommand
-  RequestTooLarge(Int)
+  RequestTooLarge(Int32)
   InvalidResponse
-  PluginStatus(Int)
+  PluginStatus(Int32)
   InstanceUnavailable
   Destroyed
   ExecutorRequired
@@ -33,7 +33,7 @@ pub(all) enum AbiError {
   ExecutorClosed
   InvocationUnavailable
   MalformedEvent
-  ExecutorStatus(Int)
+  ExecutorStatus(Int32)
 } derive(Eq, @debug.Debug)
 pub fn AbiError::equal(Self, Self) -> Bool
 
@@ -44,10 +44,10 @@ pub(all) enum AbiVersion {
 pub fn AbiVersion::equal(Self, Self) -> Bool
 
 pub(all) enum ExecutorEvent {
-  Ready(Int)
-  InvocationFinished(UInt64, Int, Bytes)
+  Ready(Int32)
+  InvocationFinished(UInt64, Int32, Bytes)
   HostRequest(HostRequest)
-  HostRequestCancelled(UInt64, UInt64, Int)
+  HostRequestCancelled(UInt64, UInt64, Int32)
   Stopped
 } derive(Eq, @debug.Debug)
 pub fn ExecutorEvent::equal(Self, Self) -> Bool
@@ -57,7 +57,7 @@ pub(all) struct HostRequest {
   invocation_id : UInt64
   command : String
   request : Bytes
-  timeout_ms : UInt
+  timeout_ms : UInt32
 } derive(Eq, @debug.Debug)
 pub fn HostRequest::equal(Self, Self) -> Bool
 
@@ -81,7 +81,7 @@ pub struct PluginExecutor {
 }
 pub fn PluginExecutor::begin_shutdown(Self) -> Unit
 pub fn PluginExecutor::cancel(Self, UInt64) -> Result[Unit, AbiError]
-pub fn PluginExecutor::cancel_host_request(Self, UInt64, Int) -> Result[Unit, AbiError]
+pub fn PluginExecutor::cancel_host_request(Self, UInt64, Int32) -> Result[Unit, AbiError]
 pub fn PluginExecutor::complete_host_request(Self, UInt64, Bytes) -> Result[Unit, AbiError]
 pub fn PluginExecutor::is_closed(Self) -> Bool
 pub fn PluginExecutor::join(Self) -> Result[Unit, AbiError]

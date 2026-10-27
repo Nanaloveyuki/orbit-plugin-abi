@@ -101,6 +101,12 @@ return memory allocated by an allocator other than `host.alloc`.
 
 ## Development
 
+Use the exact release recorded in `.moonbit-toolchain`: compiler
+`0.10.17+d971670cd` (2026-10-23), with CLI `moon 0.1.20261023`
+(`3778465`, 2026-10-23). Every Unix/Windows CI installer uses this pin.
+Native tests require a C compiler and the platform's thread support. This
+package supports only `native`; there is no cross-target or CLI executable.
+
 ~~~sh
 moon fmt --check
 moon check --target native --deny-warn --warn-list +73

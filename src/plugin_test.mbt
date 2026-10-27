@@ -32,10 +32,10 @@ extern "C" fn fixture_v2_invoke_address() -> UInt64 = "orbit_plugin_fixture_v2_i
 extern "C" fn fixture_v2_destroy_address() -> UInt64 = "orbit_plugin_fixture_v2_destroy_address"
 
 ///|
-extern "C" fn fixture_v2_thread_mismatch() -> UInt = "orbit_plugin_fixture_v2_thread_mismatch"
+extern "C" fn fixture_v2_thread_mismatch() -> UInt32 = "orbit_plugin_fixture_v2_thread_mismatch"
 
 ///|
-extern "C" fn fixture_v2_foreign_request() -> Int = "orbit_plugin_fixture_v2_foreign_request"
+extern "C" fn fixture_v2_foreign_request() -> Int32 = "orbit_plugin_fixture_v2_foreign_request"
 
 ///|
 extern "C" fn fixture_sleep() -> Unit = "orbit_plugin_fixture_sleep"

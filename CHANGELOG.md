@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Pin development and Unix/Windows CI to compiler `0.10.17+d971670cd`
+  with CLI `moon 0.1.20261023`; no public API or dependency changes.
+
 ## 0.2.3
 
 - Build with MoonBit nightly 0.1.20260923.

@@ -1,35 +1,35 @@
 ///|
-const EXECUTOR_INVALID_INPUT : Int = -2147483448
+const EXECUTOR_INVALID_INPUT : Int32 = -2147483448
 
 ///|
-const EXECUTOR_QUEUE_FULL : Int = -2147483447
+const EXECUTOR_QUEUE_FULL : Int32 = -2147483447
 
 ///|
-const EXECUTOR_CLOSED : Int = -2147483446
+const EXECUTOR_CLOSED : Int32 = -2147483446
 
 ///|
-const EXECUTOR_DUPLICATE_ID : Int = -2147483443
+const EXECUTOR_DUPLICATE_ID : Int32 = -2147483443
 
 ///|
-const EXECUTOR_NOT_READY : Int = -2147483444
+const EXECUTOR_NOT_READY : Int32 = -2147483444
 
 ///|
-const EXECUTOR_WOULD_BLOCK : Int = -2147483442
+const EXECUTOR_WOULD_BLOCK : Int32 = -2147483442
 
 ///|
-const EXECUTOR_EVENT_READY : UInt = 1
+const EXECUTOR_EVENT_READY : UInt32 = 1
 
 ///|
-const EXECUTOR_EVENT_INVOCATION_FINISHED : UInt = 2
+const EXECUTOR_EVENT_INVOCATION_FINISHED : UInt32 = 2
 
 ///|
-const EXECUTOR_EVENT_HOST_REQUEST : UInt = 3
+const EXECUTOR_EVENT_HOST_REQUEST : UInt32 = 3
 
 ///|
-const EXECUTOR_EVENT_HOST_REQUEST_CANCELLED : UInt = 4
+const EXECUTOR_EVENT_HOST_REQUEST_CANCELLED : UInt32 = 4
 
 ///|
-const EXECUTOR_EVENT_STOPPED : UInt = 5
+const EXECUTOR_EVENT_STOPPED : UInt32 = 5
 
 ///|
 /// One host IPC request made synchronously by a v2 plugin invocation.
@@ -42,7 +42,7 @@ pub(all) struct HostRequest {
   invocation_id : UInt64
   command : String
   request : Bytes
-  timeout_ms : UInt
+  timeout_ms : UInt32
 } derive(Eq, Debug)
 
 ///|
@@ -64,10 +64,10 @@ pub extend HostRequest with @debug.Debug::{to_repr}
 /// Status zero means success. A non-zero invocation status is either the
 /// plugin's own status or a documented executor bridge status.
 pub(all) enum ExecutorEvent {
-  Ready(Int)
-  InvocationFinished(UInt64, Int, Bytes)
+  Ready(Int32)
+  InvocationFinished(UInt64, Int32, Bytes)
   HostRequest(HostRequest)
-  HostRequestCancelled(UInt64, UInt64, Int)
+  HostRequestCancelled(UInt64, UInt64, Int32)
   Stopped
 } derive(Eq, Debug)
 
@@ -95,7 +95,7 @@ pub struct PluginExecutor {
 }
 
 ///|
-fn executor_status(status : Int) -> Result[Unit, AbiError] {
+fn executor_status(status : Int32) -> Result[Unit, AbiError] {
   match status {
     0 => Ok(())
     EXECUTOR_INVALID_INPUT => Err(ExecutorStatus(status))
@@ -279,7 +279,7 @@ pub fn PluginExecutor::complete_host_request(
 pub fn PluginExecutor::cancel_host_request(
   self : PluginExecutor,
   request_id : UInt64,
-  status : Int,
+  status : Int32,
 ) -> Result[Unit, AbiError] {
   if self.handle == 0UL {
     return Err(ExecutorClosed)
