@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.4 - 2026-10-27
 
 - Pin development and Unix/Windows CI to compiler `0.10.17+d971670cd`
-  with CLI `moon 0.1.20261023`; no public API or dependency changes.
+  with CLI `moon 0.1.20261023`; no public ABI changes.
+- Depend on `Nanaloveyuki/dynlib` 0.2.2.
 
 ## 0.2.3
 
