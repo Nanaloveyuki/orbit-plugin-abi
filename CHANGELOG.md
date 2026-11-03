@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5 - 2026-11-03
+
+- Pin development and CI to compiler `0.10.19+97801ee1b` and CLI
+  `moon 0.1.20261029`, with explicit version assertions on every platform.
+- Depend on `Nanaloveyuki/dynlib` 0.2.3; public APIs and ABI versions are unchanged.
+
 ## 0.2.4 - 2026-10-27
 
 - Pin development and Unix/Windows CI to compiler `0.10.17+d971670cd`

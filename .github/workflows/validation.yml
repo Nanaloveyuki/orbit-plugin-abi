@@ -38,6 +38,27 @@ jobs:
           irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
           "C:\Users\runneradmin\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
 
+      - name: Verify pinned MoonBit toolchain
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          moon version --all | grep -F "moonc v$(cat .moonbit-toolchain) ("
+          moon version --all | grep -F "moon $(cat .moon-version) ("
+
+      - name: Verify pinned MoonBit toolchain on Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $versions = moon version --all
+          $compiler = (Get-Content .moonbit-toolchain -Raw).Trim()
+          $cli = (Get-Content .moon-version -Raw).Trim()
+          if (-not ($versions | Select-String -SimpleMatch "moonc v$compiler (")) {
+            throw "MoonBit compiler $compiler is required"
+          }
+          if (-not ($versions | Select-String -SimpleMatch "moon $cli (")) {
+            throw "MoonBit CLI $cli is required"
+          }
+
       - name: Update Mooncakes registry
         run: moon update
 
