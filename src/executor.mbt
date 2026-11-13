@@ -37,13 +37,14 @@ const EXECUTOR_EVENT_STOPPED : UInt32 = 5
 /// The request and command are copied out of native storage while polling on
 /// the host thread. `timeout_ms == 0` means inherit the outer invocation
 /// deadline.
+#derive(Eq, Debug)
 pub(all) struct HostRequest {
   request_id : UInt64
   invocation_id : UInt64
   command : String
   request : Bytes
   timeout_ms : UInt32
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend HostRequest with Eq::{equal}
@@ -63,13 +64,14 @@ pub extend HostRequest with @debug.Debug::{to_repr}
 ///
 /// Status zero means success. A non-zero invocation status is either the
 /// plugin's own status or a documented executor bridge status.
+#derive(Eq, Debug)
 pub(all) enum ExecutorEvent {
   Ready(Int32)
   InvocationFinished(UInt64, Int32, Bytes)
   HostRequest(HostRequest)
   HostRequestCancelled(UInt64, UInt64, Int32)
   Stopped
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend ExecutorEvent with Eq::{equal}

@@ -14,6 +14,7 @@ pub fn supported_abi_versions() -> Array[UInt32]
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum AbiError {
   InvalidAddress
   IncompatibleAbi(UInt32)
@@ -34,31 +35,34 @@ pub(all) enum AbiError {
   InvocationUnavailable
   MalformedEvent
   ExecutorStatus(Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn AbiError::equal(Self, Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum AbiVersion {
   V1
   V2
-} derive(Eq, @debug.Debug)
+}
 pub fn AbiVersion::equal(Self, Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ExecutorEvent {
   Ready(Int32)
   InvocationFinished(UInt64, Int32, Bytes)
   HostRequest(HostRequest)
   HostRequestCancelled(UInt64, UInt64, Int32)
   Stopped
-} derive(Eq, @debug.Debug)
+}
 pub fn ExecutorEvent::equal(Self, Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) struct HostRequest {
   request_id : UInt64
   invocation_id : UInt64
   command : String
   request : Bytes
   timeout_ms : UInt32
-} derive(Eq, @debug.Debug)
+}
 pub fn HostRequest::equal(Self, Self) -> Bool
 
 pub struct Plugin {

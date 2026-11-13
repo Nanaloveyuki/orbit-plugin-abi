@@ -1,6 +1,6 @@
 name = "Nanaloveyuki/orbit-plugin-abi"
 
-version = "0.2.5"
+version = "0.2.6"
 
 description = "Fixed, auditable native ABI bridge for Orbit plugins."
 
@@ -17,5 +17,5 @@ preferred_target = "native"
 source = "src"
 
 import {
-  "Nanaloveyuki/dynlib@0.2.3",
+  "Nanaloveyuki/dynlib@0.2.4",
 }

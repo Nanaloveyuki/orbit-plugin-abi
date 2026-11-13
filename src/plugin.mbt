@@ -24,6 +24,7 @@ const WRAPPER_INVALID_INPUT : Int32 = -2147483647
 
 ///|
 /// A failure reported by the fixed Orbit plugin ABI bridge.
+#derive(Eq, Debug)
 pub(all) enum AbiError {
   InvalidAddress
   IncompatibleAbi(UInt32)
@@ -44,7 +45,7 @@ pub(all) enum AbiError {
   InvocationUnavailable
   MalformedEvent
   ExecutorStatus(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend AbiError with Eq::{equal}
@@ -60,10 +61,11 @@ pub extend AbiError with Eq::{not_equal}
 pub extend AbiError with @debug.Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum AbiVersion {
   V1
   V2
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend AbiVersion with Eq::{equal}

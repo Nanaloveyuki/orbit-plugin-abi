@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.6
+
+- Pin compiler archive `0.10.20+65efd5b93` and CLI `0.1.20261104` for local development and every CI platform.
+- Migrate trait derivations to `#derive` and update `Nanaloveyuki/dynlib` to `0.2.4`; public APIs and native ABI versions are unchanged.
+
 ## 0.2.5 - 2026-11-03
 
 - Pin development and CI to compiler `0.10.19+97801ee1b` and CLI
