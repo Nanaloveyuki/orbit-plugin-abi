@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Pin MoonBit compiler archive `1.0.0-rc1+3c0520448` and CLI `0.1.20261126`.
+- Update dynlib to 0.3.0. ABI v1 and ABI v2 remain available.
+
 ## 0.2.6
 
 - Pin compiler archive `0.10.20+65efd5b93` and CLI `0.1.20261104` for local development and every CI platform.
